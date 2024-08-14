@@ -4,8 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.mail import send_mail
 from contact.serializers import ContactSerializer
+from django_ratelimit.decorators import ratelimit
 
 
+@ratelimit(key='ip', rate='5/m', method=ratelimit.UNSAFE, block=True)
 @api_view(['POST'])
 def inquiry_request(request):
     serializer = ContactSerializer(data=request.data)
@@ -15,8 +17,8 @@ def inquiry_request(request):
 
         send_mail(
             subject="customer inquiry",
-            message=message,
-            from_email=email,
+            message=f"Message from: {email}\n\n{message}",
+            from_email="business_email@example.com",
             recipient_list=['business_email@example.com']
         )
         return Response({'status', 'success'}, status=status.HTTP_200_OK)

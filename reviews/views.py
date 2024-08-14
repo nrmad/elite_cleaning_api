@@ -8,5 +8,6 @@ from common.serializers import GenericSerializer
 @api_view(['GET'])
 def review_list(request):
     reviews = Review.objects.all()
-    serializer = GenericSerializer(reviews, many=True)
+    serializer = GenericSerializer(reviews, many=True, model=Review)
+
     return Response(serializer.data)

@@ -1,6 +1,6 @@
 from common.serializers import GenericSerializer
 from rest_framework import serializers
-from models import Media
+from .models import Media
 
 
 class MediaSerializer(serializers.ModelSerializer):
