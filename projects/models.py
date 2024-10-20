@@ -15,15 +15,20 @@ class Project(models.Model):
     title = models.TextField()
     value = models.IntegerField()
     completed = models.DateField()
-    duration = models.IntegerField()
+    contractor = models.TextField()
     description = models.TextField()
-    scope_of_works = models.JSONField(default=list)
     sector = models.ForeignKey(Sector, related_name='projects', on_delete=models.CASCADE)
-    media = models.ManyToManyField(Media)
+    media = models.ManyToManyField(Media, through='ProjectMedia')
 
     def __str__(self):
         return self.title
 
+class ScopeOfWorks(models.Model):
+    project = models.ForeignKey(Project, related_name='scope_of_works', on_delete=models.CASCADE)
+    details = models.TextField()  # You can modify this to fit the structure of scope details
+
+    def __str__(self):
+        return f"Scope of Works for {self.project.title}"
 
 class ProjectMedia(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

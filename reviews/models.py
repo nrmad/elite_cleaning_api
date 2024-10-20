@@ -7,6 +7,7 @@ class Review(models.Model):
     content = models.TextField()
     company = models.TextField()
     variant = models.TextField()
+    # LINK TO PROJECT
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

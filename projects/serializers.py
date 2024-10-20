@@ -1,9 +1,18 @@
 # projects/serializers.py
 
 from common.serializers import GenericSerializer
-from media.serializers import MediaSerializer
-from .models import Project, Media
+from .models import Project, ProjectMedia
 from rest_framework import serializers
+from .models import ScopeOfWorks
+from media.serializers import MediaSerializer  # Import your MediaSerializer
+
+
+class ProjectMediaSerializer(serializers.ModelSerializer):
+    media = MediaSerializer()  # Use MediaSerializer to serialize media details
+
+    class Meta:
+        model = ProjectMedia
+        fields = ['media']
 
 
 class SectorProjectSerializer(GenericSerializer):
@@ -11,18 +20,29 @@ class SectorProjectSerializer(GenericSerializer):
 
     class Meta:
         model = Project
-        fields = ['title', 'media']
+        fields = ['id', 'title', 'media']
 
     def get_media(self, obj):
-        # Filter media to only include cover photos
-        media_queryset = obj.media.filter(cover_photo=True)
-        #Use GenericSerializer for media
-        return GenericSerializer(media_queryset, many=True).data
+        # Fetch related media via the intermediary table ProjectMedia
+        project_media = ProjectMedia.objects.filter(project=obj, media__cover_photo=True).select_related('media')
+        return MediaSerializer([pm.media for pm in project_media], many=True).data
 
 
-class ProjectSerializer(GenericSerializer):
-    media = MediaSerializer(many=True)
+class ScopeOfWorksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScopeOfWorks
+        fields = ['id', 'details']
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    scope_of_works = ScopeOfWorksSerializer(many=True)
+    media = serializers.SerializerMethodField()  # Custom field to handle media through ProjectMedia
 
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['id', 'title', 'value', 'contractor', 'description', 'scope_of_works', 'media']
+
+    def get_media(self, obj):
+        # Fetch related media via the intermediary table ProjectMedia
+        project_media = ProjectMedia.objects.filter(project=obj).select_related('media')
+        return MediaSerializer([pm.media for pm in project_media], many=True).data
