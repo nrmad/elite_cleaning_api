@@ -16,6 +16,18 @@ class CustomPagination(PageNumberPagination):
     max_page_size = 100
 
 @api_view(['GET'])
+def latest_projects(request):
+    projects = (Project.objects.select_related('sector').order_by('-completed')[:3].prefetch_related('media')
+                .only('title', 'sector__name'))
+
+    paginator = CustomPagination()
+    paginated_projects = paginator.paginate_queryset(projects, request)
+
+    serializer = SectorProjectSerializer(paginated_projects, many=True)
+    return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(['GET'])
 def sector_projects(request, sector_id):
     # sector_id = request.query_params.get('sector_id')
     projects = Project.objects.filter(sector_id=sector_id).prefetch_related('media').only('title')
@@ -27,7 +39,14 @@ def sector_projects(request, sector_id):
 
     # Serialize the data
     serializer = SectorProjectSerializer(paginated_projects, many=True)
-    return paginator.get_paginated_response(serializer.data)
+
+    response_data = {
+        'results': serializer.data,
+        'count': paginator.page.paginator.count,
+        'total_pages': paginator.page.paginator.num_pages
+    }
+
+    return Response(response_data)
 
 
 @api_view(['GET'])

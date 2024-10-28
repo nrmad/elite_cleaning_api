@@ -17,10 +17,11 @@ class ProjectMediaSerializer(serializers.ModelSerializer):
 
 class SectorProjectSerializer(GenericSerializer):
     media = serializers.SerializerMethodField()
+    sector_name = serializers.CharField(source='sector.name')
 
     class Meta:
         model = Project
-        fields = ['id', 'title', 'media']
+        fields = ['id', 'title', 'media', 'sector_name']
 
     def get_media(self, obj):
         # Fetch related media via the intermediary table ProjectMedia
@@ -40,7 +41,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ['id', 'title', 'value', 'contractor', 'description', 'scope_of_works', 'media']
+        fields = ['id', 'title', 'value', 'completed', 'contractor', 'description', 'scope_of_works', 'media']
 
     def get_media(self, obj):
         # Fetch related media via the intermediary table ProjectMedia

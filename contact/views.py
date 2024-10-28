@@ -18,8 +18,8 @@ def inquiry_request(request):
         send_mail(
             subject="customer inquiry",
             message=f"Message from: {email}\n\n{message}",
-            from_email="business_email@example.com",
-            recipient_list=['business_email@example.com']
+            from_email="info@cleanelite.co.uk",
+            recipient_list=['info@cleanelite.co.uk']
         )
         return Response({'status', 'success'}, status=status.HTTP_200_OK)
 
