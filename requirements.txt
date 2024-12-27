@@ -6,3 +6,6 @@ psycopg2-binary==2.9.9
 pytz==2024.1
 sqlparse==0.5.1
 typing-extensions==4.12.2
+
+requests~=2.32.3
+django-ratelimit~=4.1.0
